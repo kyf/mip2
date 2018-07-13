@@ -79,6 +79,7 @@ let env = {}
 if (util.hash.get('prefetch') === '1') {
   env.prefetch = true
   window.addEventListener('hashchange', function () {
+    console.log('hashchange')
     util.hash.refreshHashTree()
     if (!util.hash.get('prefetch')) {
       env.prefetch = false

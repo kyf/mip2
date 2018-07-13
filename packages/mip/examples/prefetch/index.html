@@ -9,8 +9,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
   <style>
-    button {
-      display: block
+    #load, #show {
+      display: block;
+      height: 100px;
+      width: 100%;
+      line-height: 100px;
+      background-color: #eee;
+      margin-top: 10px;
+      text-align: center;
+      cursor: pointer;
     }
 
     html, body {
@@ -25,30 +32,37 @@
       height: 100%;
     }
     #page-container {
+      display: none;
       position: absolute;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
       transform: translateX(100%);
-      width: 100%;
-      height: 100%;
       transition: .5s;
       background: #eee;
     }
+
+
   </style>
 </head>
 <body>
-  <button id="load">Click to load mip page</button>
-  <button id="show">Click to show mip page</button>
+  <div id="load">Click to prerender mip page</div>
+  <div id="show">Click to show mip page</div>
   <div id="page-container"></div>
   <script>
-    let btnLoad = document.querySelector('#load')
-    let btnShow = document.querySelector('#show')
-    let iframe
-    let container = document.querySelector('#page-container')
-
+    // window.onerror = function (msg) {
+    //   alert(msg)
+    // }
+    var btnLoad = document.querySelector('#load')
+    var btnShow = document.querySelector('#show')
+    var iframe
+    var container = document.querySelector('#page-container')
+    // var mipPageUrl = '/examples/prefetch/mip-page.html'
+    var mipPageUrl = '/examples/builtin/mip-img.html'
     function createPage() {
       iframe = document.createElement('iframe')
-      iframe.scrolling = 'no'
+      iframe.scrolling = 'yes'
       iframe.referrerpolicy = 'always'
       iframe.sandbox = 'allow-top-navigation allow-popups allow-scripts allow-forms allow-pointer-lock allow-popups-to-escape-sandbox allow-same-origin allow-modals'
       iframe.frameBorder = 0
@@ -57,19 +71,22 @@
     function loadMipPage() {
       console.log('loadMipPage')
       createPage()
-      iframe.src = '/examples/prefetch/mip-page.html#prefetch=1'
+      iframe.src = mipPageUrl + '#prefetch=1'
       container.appendChild(iframe)
     }
 
     function showMipPage() {
       console.log('showMipPage')
+      container.style.display = 'block'
 
-      container.style.transform = 'translateX(0)'
+      setTimeout(function () {
+        container.style.transform = 'translateX(0)'
+      }, 1)
 
-      setTimeout(() => {
+      setTimeout(function () {
         if (!iframe) {
           createPage()
-          iframe.src = '/examples/prefetch/mip-page.html#prefetch=0'
+          iframe.src = mipPageUrl + '#prefetch=0'
           container.appendChild(iframe)
         }
         else {
