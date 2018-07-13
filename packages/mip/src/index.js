@@ -74,6 +74,21 @@ function push (extension) {
   extensions.push(extension)
 }
 
+let env = {}
+
+if (util.hash.get('prefetch') === '1') {
+  env.prefetch = true
+  window.addEventListener('hashchange', function () {
+    util.hash.refreshHashTree()
+    if (!util.hash.get('prefetch')) {
+      env.prefetch = false
+      window.dispatchEvent(new window.CustomEvent('prefetch-page-active', {bubbles: false}))
+    }
+  })
+}
+
+viewport.env = env
+
 let mip = {
   version: '2',
   registerVueCustomElement,
@@ -89,7 +104,8 @@ let mip = {
   prerenderElement: Resources.prerenderElement,
   builtinComponents: {
     MipShell
-  }
+  },
+  env
 }
 
 window.MIP = mip

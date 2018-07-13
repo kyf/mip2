@@ -91,13 +91,12 @@ class Resources {
    * @param {MIPElement} element A mip element
    */
   add (element) {
+    let renderStart = Date.now()
     element._eid = this._eid++
     resources[this._rid][element._eid] = element
     element.build()
     this.updateState()
-    // setTimeout(() => {
-    //     this.updateState();
-    // });
+    console.log(element.tagName, Date.now() - renderStart)
   }
 
   /**

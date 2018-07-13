@@ -10,6 +10,7 @@ import layout from './layout'
 import performance from './performance'
 import customElementsStore from './custom-element-store'
 import cssLoader from './util/dom/css-loader'
+import viewport from './viewport'
 
 class BaseElement extends HTMLElement {
   constructor (element) {
@@ -59,9 +60,21 @@ class BaseElement extends HTMLElement {
     this.classList.add('mip-element')
     this._layout = layout.applyLayout(this)
     this.customElement.connectedCallback()
+    let element = this
+
+    // console.log('responseEnd-connectedCallback: ', this.tagName, Date.now() - window.performance.timing.responseStart)
+    let cb = function () {
+      console.log('prefetch-page-active')
+      element._resources.add(element)
+      window.removeEventListener('prefetch-page-active', cb)
+    }
 
     // Add to resource manager.
-    this._resources && this._resources.add(this)
+    if (viewport.env.prefetch) {
+      window.addEventListener('prefetch-page-active', cb)
+    } else {
+      element._resources.add(element)
+    }
   }
 
   disconnectedCallback () {
@@ -72,7 +85,17 @@ class BaseElement extends HTMLElement {
 
   attributeChangedCallback () {
     let ele = this.customElement
-    ele.attributeChangedCallback.apply(ele, arguments)
+    let cb = () => {
+      console.log('prefetch-page-active')
+      ele.attributeChangedCallback.apply(ele, arguments)
+      window.removeEventListener('prefetch-page-active', cb)
+    }
+
+    if (viewport.env.prefetch) {
+      window.addEventListener('prefetch-page-active', cb)
+    } else {
+      ele.attributeChangedCallback.apply(ele, arguments)
+    }
   }
 
   build () {
